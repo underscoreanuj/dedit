@@ -46,6 +46,31 @@ describe("CRDT", () => {
             expect(crdt_obj.toText()).toEqual(random_txt);
         });
     });
+
+    describe("localDelete:", () => {
+        it("checks that deleteing empty crdt object returns undefined", () => {
+            let crdt_obj = new CRDT(1);
+
+            expect(crdt_obj.localDelete(0)).toBe(undefined);
+        });
+
+        it("checks that inserting and deleteing returns valid values", () => {
+            let crdt_obj = new CRDT(1);
+
+            crdt_obj.localInsert("a", 0);
+            expect(crdt_obj.localDelete(0)?.value).toEqual("a");
+            expect(crdt_obj.text.length).toEqual(0);
+
+            crdt_obj.localInsert("a", 0);
+            crdt_obj.localInsert("b", 0);
+            expect(crdt_obj.localDelete(0)?.value).toEqual("b");
+            expect(crdt_obj.text.length).toEqual(1);
+
+            crdt_obj.localInsert("b", 0);
+            expect(crdt_obj.localDelete(1)?.value).toEqual("a");
+            expect(crdt_obj.text.length).toEqual(1);
+        });
+    });
 });
 
 export { };

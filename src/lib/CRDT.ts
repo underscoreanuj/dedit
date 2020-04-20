@@ -90,6 +90,13 @@ class CRDT {
         return undefined;
     }
 
+    localDelete(index: number): Char | undefined {
+        const char = this.text.splice(index, 1)[0];
+        if (char)
+            return char;
+        return undefined;
+    }
+
     toText(): String {
         return this.text.map(char => char.value).join('');
     }
