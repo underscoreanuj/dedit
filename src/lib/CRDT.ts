@@ -34,7 +34,7 @@ class CRDT {
         let id_r = pos_r[0] || new Identifier(base, this.siteID);
 
         if (id_r.digit - id_l.digit > 1) {
-            // can easily generate a new digit between the left and right positions
+            // can generate a new digit between the left and right positions
             let newDigit = this.generateIdBetween(id_l.digit, id_r.digit);
             newPos.push(new Identifier(newDigit, this.siteID));
             return newPos;
