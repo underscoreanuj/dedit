@@ -11,6 +11,10 @@ class Identifier {
         /**
          * use the digit to determine the larget identifier
          * use the siteID as the tie-breaker
+         * 
+         * -1: less than
+         *  0: equal
+         *  1: greater than
          */
         if (this.digit < otherIdentifier.digit)
             return -1;

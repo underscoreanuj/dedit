@@ -17,6 +17,10 @@ class Char {
         /**
          * compare the identifiers untill a mismatch is found
          * use the identifier array length as a tie breaker
+         * 
+         * -1: less than
+         *  0: equal
+         *  1: greater than
          */
         let comp;
         const pos1 = this.position.length;

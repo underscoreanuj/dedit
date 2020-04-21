@@ -12,6 +12,42 @@ class CRDT {
         this.text = [];
     }
 
+    toText(): String {
+        return this.text.map(char => char.value).join('');
+    }
+
+
+    localInsert(value: string, index: number): Char | undefined {
+        /**
+         * inserts the given value at the given index locally by generating a valid character identifier
+         */
+        const char = this.generateChar(value, index);
+        if (char) {
+            this.text.splice(index, 0, char);
+            return char;
+        }
+        return undefined;
+    }
+
+    remoteInsert(char: Char): Char {
+        /**
+         * places the given Char object coming from another site into the local instance of text
+         */
+        const index = this.findInsertIndex(char);
+        this.text.splice(index, 0, char);
+        return char;
+    }
+
+    localDelete(index: number): Char | undefined {
+        /**
+         * deletes the value at the specified index from the text
+         */
+        const char = this.text.splice(index, 1)[0];
+        if (char)
+            return char;
+        return undefined;
+    }
+
     generateIdBetween(min: number, max: number): number {
         /**
          * generates a number between min & max
@@ -78,29 +114,40 @@ class CRDT {
         return undefined;
     }
 
-    localInsert(value: string, index: number): Char | undefined {
+    findInsertIndex(char: Char): number {
         /**
-         * inserts the given value at the given index by generating a valid character identifier
+         * uses binary serach to find to position of insertion for the given char in the text
          */
-        const char = this.generateChar(value, index);
-        if (char) {
-            this.text.splice(index, 0, char);
-            return char;
+
+        let left = 0;
+        let right = this.text.length - 1;
+
+        if (this.text.length === 0 || char.compareTo(this.text[left]) === -1) {
+            // insert at begining
+            return 0;
         }
-        return undefined;
-    }
+        if (char.compareTo(this.text[right]) === 1) {
+            // insert at end
+            return this.text.length;
+        }
 
-    localDelete(index: number): Char | undefined {
-        const char = this.text.splice(index, 1)[0];
-        if (char)
-            return char;
-        return undefined;
-    }
+        let mid = 0;
+        let comp = 0;
 
-    toText(): String {
-        return this.text.map(char => char.value).join('');
-    }
+        while (left + 1 < right) {
+            mid = left + ((right - left) >> 1);
+            comp = char.compareTo(this.text[mid]);
 
+            if (comp === 0)
+                return mid;
+            else if (comp === 1)
+                left = mid;
+            else
+                right = mid;
+        }
+
+        return char.compareTo(this.text[left]) === 0 ? left : right;
+    }
 }
 
 export default CRDT;
