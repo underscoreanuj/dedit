@@ -22,20 +22,23 @@ class CRDT {
          * inserts the given value at the given index locally by generating a valid character identifier
          */
         const char = this.generateChar(value, index);
-        if (char) {
+        if (char !== undefined) {
             this.text.splice(index, 0, char);
             return char;
         }
         return undefined;
     }
 
-    remoteInsert(char: Char): Char {
+    remoteInsert(char: Char): Char | undefined {
         /**
          * places the given Char object coming from another site into the local instance of text
          */
-        const index = this.findInsertIndex(char);
-        this.text.splice(index, 0, char);
-        return char;
+        const index = this.findIndex(char);
+        if (index !== undefined) {
+            this.text.splice(index, 0, char);
+            return char;
+        }
+        return undefined;
     }
 
     localDelete(index: number): Char | undefined {
@@ -43,8 +46,20 @@ class CRDT {
          * deletes the value at the specified index from the text
          */
         const char = this.text.splice(index, 1)[0];
-        if (char)
+        if (char !== undefined)
             return char;
+        return undefined;
+    }
+
+    remoteDelete(char: Char): Char | undefined {
+        /**
+         * deletes the given char using its identifier, if present
+         */
+        const index = this.findIndex(char, false);
+        if (index !== undefined) {
+            const char = this.text.splice(index, 1)[0];
+            return char;
+        }
         return undefined;
     }
 
@@ -114,21 +129,31 @@ class CRDT {
         return undefined;
     }
 
-    findInsertIndex(char: Char): number {
+    findIndex(char: Char, insert: boolean = true): number | undefined {
         /**
-         * uses binary serach to find to position of insertion for the given char in the text
+         * uses binary serach to find to position of insertion/actual position of the given char object
+         * by default it finds the position of insertion
+         * if insert := false, it finds the position in this.text
          */
 
         let left = 0;
         let right = this.text.length - 1;
 
-        if (this.text.length === 0 || char.compareTo(this.text[left]) === -1) {
-            // insert at begining
-            return 0;
+        if (insert) {
+            if (this.text.length === 0 || char.compareTo(this.text[left]) === -1) {
+                // insert at begining
+                return 0;
+            }
+            if (char.compareTo(this.text[right]) === 1) {
+                // insert at end
+                return this.text.length;
+            }
         }
-        if (char.compareTo(this.text[right]) === 1) {
-            // insert at end
-            return this.text.length;
+        else {
+            if (this.text.length === 0) {
+                // char cannot exist
+                return undefined;
+            }
         }
 
         let mid = 0;
@@ -146,7 +171,16 @@ class CRDT {
                 right = mid;
         }
 
-        return char.compareTo(this.text[left]) === 0 ? left : right;
+        if (insert)
+            return char.compareTo(this.text[left]) === 0 ? left : right;
+        else {
+            if (char.compareTo(this.text[left]) === 0)
+                return left;
+            else if (char.compareTo(this.text[right]) === 0)
+                return right;
+            else
+                return undefined;
+        }
     }
 }
 

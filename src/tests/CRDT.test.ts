@@ -104,6 +104,31 @@ describe("CRDT", () => {
             expect(crdt_obj.toText()).toBe("BA");
         });
     });
+
+    describe("remoteDelete:", () => {
+        let crdt_obj: CRDT;
+        let char_obj: Char;
+
+        beforeEach(() => {
+            crdt_obj = new CRDT(siteID);
+            const pos = [new Identifier(1, siteID)];
+            char_obj = new Char("A", 0, pos, siteID);
+            crdt_obj.remoteInsert(char_obj);
+        });
+
+        it("removing a char remotely reduces the length", () => {
+            expect(crdt_obj.text.length).toBe(1);
+            crdt_obj.remoteDelete(char_obj);
+            expect(crdt_obj.text.length).toBe(0);
+        });
+
+        it("removing a char remotely changes the text", () => {
+            expect(crdt_obj.toText()).toBe('A');
+            crdt_obj.remoteDelete(char_obj);
+            expect(crdt_obj.toText()).toBe('');
+        });
+    });
+
 });
 
 export { };
