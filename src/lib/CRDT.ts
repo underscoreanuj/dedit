@@ -1,7 +1,11 @@
 import Char from "./Char";
 import Identifier from "./Identifier";
 
+
 class CRDT {
+    /**
+    * Conflict-free replicated data type implementation based on the Char and Identifier class
+    */
     siteID: number;
     base: number;
     text: Array<Char>;
