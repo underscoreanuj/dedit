@@ -2,7 +2,8 @@ import Char from "../lib/Char";
 import CRDT from "../lib/CRDT";
 import Identifier from "../lib/Identifier";
 
-describe("CRDT", () => {
+
+describe("CRDT - Tests", () => {
     const siteID = Math.floor(Math.random() * 1000);
 
     describe("localInsert:", () => {
